@@ -1,11 +1,10 @@
 const fs = require('fs')
 const readline = require('readline')
-const arr = []
+const parking = []
 const _ = require('lodash')
 // also works: var arr = [];
-async function processLineByLine() {
+async function commandRunner() {
   const fileStream = fs.createReadStream('input.txt')
-
   const rl = readline.createInterface({
     input: fileStream,
     crlfDelay: Infinity
@@ -14,27 +13,27 @@ let maxSize = 0
   for await (const line of rl) {
     const command = line.split(' ')[0]
     const value = _.tail(line.split(' '))
-    switch (command) {
-        case 'create':
+    switch (command.toUpperCase()) {
+        case 'CREATE':
             if (maxSize < value[0]) {
                 maxSize = value[0]
                 console.log(`Created parking lot with ${maxSize} slots`)
             } else {
-                console.log(`Parking lot with larger size already present - ${maxSize}`)
+                console.log(`Parking lot with larger size already present - ${maxSize}`) // Extra Condition added if you want to increase parking lot size, just type 'create <VALUE GREATER THAN PREVIOUS SIZE>
             }
 
           break
-        case 'park':
+        case 'PARK':
             let isCarParked = false
             let slot = 0
             for (; slot < maxSize; slot++) {
-                if (arr[slot] === value[0]) {
+                if (parking[slot] === value[0]) {
                     console.log(`Car already present ${value}`)
                     break
                 }
-                if (_.isEqual(typeof arr[slot], 'undefined')) {
-                    arr[slot] = value[0]
-                    console.log(`Allocated slot number: ${slot + 1} - ${arr[slot] === undefined ? 'Empty' : arr[slot]}`)
+                if (_.isEqual(typeof parking[slot], 'undefined')) {
+                    parking[slot] = value[0]
+                    console.log(`Allocated slot number: ${slot + 1} - ${parking[slot] === undefined ? 'Empty' : parking[slot]}`)
                     isCarParked = true
                     break
                 }
@@ -43,14 +42,14 @@ let maxSize = 0
                 console.log('Sorry, parking lot is full')
             }
           break
-        case 'leave':
+        case 'LEAVE':
             let charge = 0
             let leaveSlot = 0
             for (; leaveSlot < maxSize; leaveSlot++) {
-                if (_.isEqual(arr[leaveSlot], value[0])) {
+                if (_.isEqual(parking[leaveSlot], value[0])) {
                     charge = (value[1] > 2 ? (value[1] - 2) * 10 : 0) + 10
-                    console.log(`Registration Number ${arr[leaveSlot]} from Slot ${leaveSlot + 1} has left with Charge ${charge}`)
-                    delete arr[leaveSlot]
+                    console.log(`Registration Number ${parking[leaveSlot]} from Slot ${leaveSlot + 1} has left with Charge ${charge}`)
+                    delete parking[leaveSlot]
                     break
                 }
             }
@@ -58,12 +57,12 @@ let maxSize = 0
                 console.log(`Registration Number  ${value[0]} not found`)
             }
           break
-        case 'status':
+        case 'STATUS':
             console.log('Slot No. Registration No')
-            for (let j = 0; j < maxSize; j++) { if (arr[j] !== undefined) console.log(`${j + 1} \t ${arr[j]}`) }
+            for (let slot = 0; slot < maxSize; slot++) { if (parking[slot] !== undefined) console.log(`${slot + 1} \t ${parking[slot]}`) }
           break
       }
   }
 }
 
-processLineByLine()
+commandRunner()
