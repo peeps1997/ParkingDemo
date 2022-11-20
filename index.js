@@ -4,7 +4,7 @@ const parking = []
 const _ = require('lodash')
 // also works: var arr = [];
 async function commandRunner() {
-  const fileStream = fs.createReadStream('input.txt')
+  const fileStream = fs.createReadStream(process.argv[2])
   const rl = readline.createInterface({
     input: fileStream,
     crlfDelay: Infinity
